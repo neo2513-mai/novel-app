@@ -46,6 +46,12 @@ def main(page: ft.Page):
         else:
             go_home()
 
+    # ⚡ ฟังก์ชันสำหรับสั่งรีเฟรชดึงข้อมูลใหม่
+    def refresh_data():
+        state["episodes_data"] = []  # ล้างข้อมูลชั่วคราวเพื่อแสดงวงกลมหมุนรอ
+        route_change()
+        page.run_thread(fetch_episodes, page, on_bg_fetch_complete)
+
     def route_change(e=None):
         page.views.clear()
 
@@ -55,6 +61,7 @@ def main(page: ft.Page):
                     page,
                     episodes_data=state["episodes_data"],
                     on_select_episode=open_episode,
+                    on_refresh=refresh_data,  # ⚡ ส่งฟังก์ชันรีเฟรชเข้าไป
                 )
             )
         elif page.route == "/read":
@@ -69,7 +76,7 @@ def main(page: ft.Page):
 
         page.update()
 
-    # 2. ปรับกลับเป็น def ธรรมดาเพื่อให้ api.py เรียกใช้ได้โดยตรง
+    # 2. Callback เมื่อดึงข้อมูลจาก API เสร็จเรียบร้อย
     def on_bg_fetch_complete(new_data):
         if new_data and new_data != state["episodes_data"]:
             state["episodes_data"] = new_data
@@ -90,7 +97,7 @@ def main(page: ft.Page):
     page.route = "/"
     route_change()
 
-    # ดึงข้อมูลเบื้องหลัง
+    # ดึงข้อมูลเบื้องหลังเมื่อเปิดแอปครั้งแรก
     page.run_thread(fetch_episodes, page, on_bg_fetch_complete)
 
 

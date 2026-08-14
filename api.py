@@ -4,7 +4,7 @@ from config import API_URL
 def fetch_episodes(page, on_complete):
     episodes = []
     try:
-        response = requests.get(API_URL, timeout=15)
+        response = requests.get(API_URL, timeout=30)
         if response.status_code == 200:
             new_data = response.json()
             if isinstance(new_data, dict) and "data" in new_data:

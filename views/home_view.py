@@ -1,7 +1,7 @@
 import flet as ft
 from config import READAWRITE_URL, MESSENGER_URL
 
-def build_home_view(page, episodes_data, on_select_episode):
+def build_home_view(page, episodes_data, on_select_episode, on_refresh=None):
     # Header Banner
     header_banner = ft.Container(
         gradient=ft.LinearGradient(
@@ -31,7 +31,7 @@ def build_home_view(page, episodes_data, on_select_episode):
                             controls=[
                                 ft.Icon(ft.Icons.PHONE, color=ft.Colors.GREEN, size=15),
                                 ft.Text(
-                                    "081-234-5678",
+                                    "094-6702121",
                                     size=15,
                                     weight=ft.FontWeight.BOLD,
                                     color=ft.Colors.BLACK_87,
@@ -59,36 +59,74 @@ def build_home_view(page, episodes_data, on_select_episode):
                         ),
                         ft.Row(
                             controls=[
-                                ft.IconButton(
-                                    icon=ft.Icons.CHAT_BUBBLE,
-                                    icon_color=ft.Colors.BLUE,
-                                    icon_size=20,
-                                    padding=0,
-                                    tooltip="เปิด Messenger",
-                                    on_click=lambda _: page.launch_url(MESSENGER_URL),
-                                ),
-                                ft.Text(
-                                    "กด icon ติดต่อเราผ่าน Messenger",
-                                    size=14,
-                                    color=ft.Colors.RED,
-                                    weight=ft.FontWeight.BOLD,
-                                ),
+                               
+                               ft.Text(
+                                   spans=[
+                                       ft.TextSpan(
+                                       "Messenger :--  ",
+                                        style=ft.TextStyle(
+                                        size=14,
+                                        color=ft.Colors.RED,
+                                        weight=ft.FontWeight.BOLD,
+                                       ),
+                                    ),
+                                  ft.TextSpan(
+                                     "m.me/khedkhean ",
+                                      style=ft.TextStyle(
+                                      size=14,
+                                     color=ft.Colors.BLUE,  # เปลี่ยนเฉพาะส่วนนี้เป็นสีน้ำเงิน
+                                     weight=ft.FontWeight.BOLD,
+                                    ),
+                                 ),
+                              ],
+                             )
                             ],
                             vertical_alignment=ft.CrossAxisAlignment.CENTER,
                         )
                     ],
                 ),
                 ft.Container(height=5),
-                ft.Text(
-                    "นิยายอ่านฟรี...",
-                    size=22,
-                    weight=ft.FontWeight.BOLD,
-                    color=ft.Colors.BLUE,
+                # ⚡ เพิ่มแถบหัวข้อพร้อมปุ่ม Refresh ด้านขวา
+                # ⚡ แถบหัวข้อพร้อมปุ่มและข้อความ Refresh
+                ft.Row(
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                    vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                    controls=[
+                        ft.Text(
+                            "นิยายอ่านฟรี...",
+                            size=22,
+                            weight=ft.FontWeight.BOLD,
+                            color=ft.Colors.BLUE,
+                        ),
+                        # จัดกลุ่มไอคอนกับข้อความให้อยู่ติดกันด้านขวา
+                        ft.Row(
+                            spacing=2,
+                            tight=True,
+                            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                            controls=[
+                                ft.IconButton(
+                                    icon=ft.Icons.REFRESH_ROUNDED,
+                                    icon_color=ft.Colors.BLUE_700,
+                                    icon_size=26,
+                                    tooltip="รีเฟรชดึงข้อมูลล่าสุด",
+                                    on_click=lambda _: on_refresh() if on_refresh else None,
+                                ),
+                                ft.Text(
+                                    "รีเฟรซ อ่านตอนใหม่",
+                                    size=13,
+                                    weight=ft.FontWeight.BOLD,
+                                    color=ft.Colors.BLUE_700,
+                                ),
+                            ],
+                        ),
+                    ],
                 ),
+
                 ft.Text(
                     "จินตนาการไม่มีวันจบ.. หากมันอยู่ในหัว จงฟังเสียงมัน",
-                    size=12,
+                    size=14,
                     color=ft.Colors.BLACK_87,
+                    weight=ft.FontWeight.BOLD,
                 ),
             ]
         ),
@@ -178,26 +216,22 @@ def build_home_view(page, episodes_data, on_select_episode):
         selected_index = e.control.selected_index
         
         if selected_index == 0:
-            # ใช้ url_launcher ตัวใหม่พร้อม await
             await page.url_launcher.launch_url(READAWRITE_URL)
-            # ตั้งค่า selected_index เป็น 0 หรือเปลี่ยนไปแท็บอื่น (ห้ามใส่ None)
             e.control.selected_index = 0
             page.update()
         elif selected_index == 1:
-            # e.control.selected_index = 1
             page.update()
 
     bottom_nav = ft.NavigationBar(
         bgcolor=ft.Colors.WHITE,
         elevation=0,
-        selected_index=0,  # ⚡ กำหนดค่าเริ่มต้นเป็น int ห้ามเป็น None
+        selected_index=0,
         on_change=nav_change,
         destinations=[
             ft.NavigationBarDestination(
                 icon=ft.Icons.SEARCH,
                 label="ดูนิยายทั้งหมด",
             ),
-      
             ft.NavigationBarDestination(
                 icon=ft.Image(
                     src="https://i.ibb.co/hFcfCrhV/b1.png",
